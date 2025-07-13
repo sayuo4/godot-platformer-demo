@@ -4,18 +4,18 @@ extends Node
 ## Emitted when the active state is changed.
 signal state_transitioned(previous_state: State, new_state: State)
 
-## The node that the state machine will be used to manage.
+## Node managed by the state machine.
 @export var target_node: Node
 
-## The states that will work with state machine.[br][br]
+## States used by the state machine.[br][br]
 ## [b]Note:[/b] The value of this variable will be set based on the state machine child nodes.
 var states: Dictionary[StringName, State]
 
-## The state that is currently activated.[br][br]
-## [b]Note:[/b] the value of this variable should be a child of the state machine.
+## Currently active state.[br][br]
+## [b]Note:[/b] The value of this variable should be a child of the state machine.
 var active_state: State: set = set_active_state
-## The state that will be activated by default.[br][br]
-## [b]Note:[/b] the value of this variable will be set into [member active_state] when the current scene is ready.
+## State to be activated by default.[br][br]
+## [b]Note:[/b] The value of this variable will be set into [member active_state] when the current scene is ready.
 @export var default_state: State
 
 func _ready() -> void:
@@ -42,6 +42,9 @@ func _physics_process(delta: float) -> void:
 	if active_state:
 		active_state._physics_update(delta)
 
+## Transitions between states in the state machine.
+## Calls [method State._exit] and [method State._enter] between states.
+## Validates the new state, and emits a transition signal.
 func set_active_state(new_state: State) -> void:
 	var previous_state := active_state
 	

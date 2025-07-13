@@ -1,6 +1,7 @@
 class_name State
 extends Node
 
+## The state machine managing this state.
 var state_machine: StateMachine
 
 func _ready() -> void:
