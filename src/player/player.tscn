@@ -1,0 +1,42 @@
+[gd_scene load_steps=6 format=3 uid="uid://8tmh6xvsllt0"]
+
+[ext_resource type="Script" uid="uid://gf5tc7312xrc" path="res://src/player/player.gd" id="1_4anbu"]
+[ext_resource type="Script" uid="uid://bu2h2ywnfvn6e" path="res://src/state_machine/state_machine.gd" id="2_rxibo"]
+
+[sub_resource type="QuadMesh" id="QuadMesh_4anbu"]
+size = Vector2(56, 96)
+
+[sub_resource type="QuadMesh" id="QuadMesh_rxibo"]
+size = Vector2(16, 16)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_4anbu"]
+size = Vector2(56, 96)
+
+[node name="Player" type="CharacterBody2D"]
+script = ExtResource("1_4anbu")
+metadata/_custom_type_script = "uid://gf5tc7312xrc"
+
+[node name="Shape" type="Node2D" parent="."]
+position = Vector2(0, 48)
+
+[node name="Body" type="MeshInstance2D" parent="Shape"]
+position = Vector2(0, -48)
+mesh = SubResource("QuadMesh_4anbu")
+
+[node name="Eye1" type="MeshInstance2D" parent="Shape"]
+self_modulate = Color(0, 0, 0, 1)
+position = Vector2(-1, -73)
+mesh = SubResource("QuadMesh_rxibo")
+
+[node name="Eye2" type="MeshInstance2D" parent="Shape"]
+self_modulate = Color(0, 0, 0, 1)
+position = Vector2(23, -73)
+mesh = SubResource("QuadMesh_rxibo")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_4anbu")
+
+[node name="StateMachine" type="Node" parent="." node_paths=PackedStringArray("target_node")]
+script = ExtResource("2_rxibo")
+target_node = NodePath("..")
+metadata/_custom_type_script = "uid://bu2h2ywnfvn6e"
