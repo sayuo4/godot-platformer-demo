@@ -47,7 +47,7 @@ extends CharacterBody2D
 ## [b]Note:[/b] The value of this variable will be multiplied by [method default_gravity_force].
 @export_range(0, 1) var at_jump_peak_gravity_multiplier: float
 ## Multiplier applied to horizontal velocity when reaching jump peak.[br][br]
-## [b]Note:[/b] The value of this variable will be multiplied by the [member velocity].x value.
+## [b]Note:[/b] The value of this variable will be multiplied by the [member CharacterBody2D.velocity].x value.
 @export_range(1, 2) var jump_peak_horizontal_boost_multiplier: float
 ## Calculated jump force.
 @onready var jump_force: float = (2.0 * jump_height) / jump_time_to_peak
@@ -106,7 +106,7 @@ func apply_gravity(delta: float) -> void:
 	 
 	velocity.y = clampf(velocity.y, -INF, gravity_limit())
 
-## Default values of the gravity force based on [member velocity].y value.
+## Default values of the gravity force based on [member CharacterBody2D.velocity].y value.
 func default_gravity_force() -> float:
 	return falling_gravity if velocity.y >= 0.0 else jumping_gravity
 
