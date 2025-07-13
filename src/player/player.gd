@@ -21,7 +21,8 @@ extends CharacterBody2D
 ## Moving deceleration while the player is falling.
 @export var falling_dec: float
 
-@export_group("Gravity")
+@export_group("Vertical Movement")
+@export_subgroup("Gravity")
 ## Multiplier applied to gravity force while jump action is not pressed.[br][br]
 ## [b]Note:[/b] The value of this variable will be multiplied by [method default_gravity_force].
 @export_range(1, 2) var jump_not_pressed_gravity_multiplier: float
@@ -34,7 +35,7 @@ extends CharacterBody2D
 ## [b]Note:[/b] The value of this variable will be multiplied by [member default_gravity_limit].
 @export_range(1, 2) var down_pressed_gravity_limit_multiplier: float
 
-@export_group("Jump")
+@export_subgroup("Jump")
 ## Normal jump height.
 @export var jump_height: float
 ## Time to reach jump peak.
@@ -56,7 +57,17 @@ extends CharacterBody2D
 ## Calculated gravity force for falling.
 @onready var falling_gravity: float = (2.0 * jump_height) / (jump_time_to_land * jump_time_to_land)
 
-@export_group("Wall Jump")
+@export_group("On Wall")
+@export_subgroup("Wall Slide")
+## Maximum vertical speed while wall sliding.
+@export var maximum_wall_sliding_speed: float
+## Multiplier applied to wall sliding speed while the player is pressing the down action.[br][br]
+## [b]Note:[/b] The value of this variable will be multiplied by [member wall_sliding_speed].
+@export_range(1, 2) var down_pressed_wall_slide_speed_multiplier: float
+## Vertical acceleration while wall sliding.
+@export var wall_sliding_acc: float
+
+@export_subgroup("Wall Jump")
 ## Horizontal force of the wall jump.
 @export var wall_jump_horizontal_force: float
 ## Vertical force of the wall jump.
@@ -70,15 +81,6 @@ extends CharacterBody2D
 @export var wall_jumping_dec: float
 ## Moving deceleration while the player is wall jumping and moving in the direction of the wall.
 @export var wall_jumping_toward_wall_dec: float
-
-@export_group("Wall Slide")
-## Maximum vertical speed while wall sliding.
-@export var maximum_wall_sliding_speed: float
-## Multiplier applied to wall sliding speed while the player is pressing the down action.[br][br]
-## [b]Note:[/b] The value of this variable will be multiplied by [member wall_sliding_speed].
-@export_range(1, 2) var down_pressed_wall_slide_speed_multiplier: float
-## Vertical acceleration while wall sliding.
-@export var wall_sliding_acc: float
 
 ## Horizontal input value based on left and right actions.
 func horizontal_input() -> float:
