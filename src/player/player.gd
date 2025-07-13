@@ -23,10 +23,10 @@ extends CharacterBody2D
 
 @export_group("Gravity")
 ## Multiplier applied to gravity force while jump action is not pressed.[br][br]
-## [b]Note:[/b] The value of this variable will be multiplied by [member jumping_gravity] and [member falling_gravity].
+## [b]Note:[/b] The value of this variable will be multiplied by [method default_gravity_force].
 @export_range(1, 2) var jump_not_pressed_gravity_multiplier: float
 ## Multiplier applied to gravity force while down action is pressed and the player is falling.[br][br]
-## [b]Note:[/b] The value of this variable will be multiplied by [member jumping_gravity] and [member falling_gravity].
+## [b]Note:[/b] The value of this variable will be multiplied by [method default_gravity_force].
 @export_range(2, 3) var down_pressed_gravity_multiplier: float
 ## Maximum value the gravity can reach.
 @export var default_gravity_limit: float
@@ -44,7 +44,7 @@ extends CharacterBody2D
 ## Maximum upward velocity to detect jump peak.
 @export var jump_peak_velocity: float
 ## Multiplier applied to gravity force at jump peak.[br][br]
-## [b]Note:[/b] The value of this variable will be multiplied by [member jumping_gravity] and [member falling_gravity].
+## [b]Note:[/b] The value of this variable will be multiplied by [method default_gravity_force].
 @export_range(0, 1) var at_jump_peak_gravity_multiplier: float
 ## Multiplier applied to horizontal velocity when reaching jump peak.[br][br]
 ## [b]Note:[/b] The value of this variable will be multiplied by the [member velocity].x value.
@@ -79,3 +79,62 @@ extends CharacterBody2D
 @export_range(1, 2) var down_pressed_wall_slide_speed_multiplier: float
 ## Vertical acceleration while wall sliding.
 @export var wall_sliding_acc: float
+
+## Horizontal input value based on left and right actions.
+func horizontal_input() -> float:
+	return Input.get_axis("left", "right")
+
+## Applies horizontal movement by accelerating or decelerating the velocity towards the maximum speed.
+func apply_movement(acc: float, dec: float) -> void:
+	var movement_dir_h := movement_dir().x
+	var speed := maximum_speed * horizontal_input()
+	var apply_acc := (
+			velocity.x <= speed and movement_dir_h == 1
+			or velocity.x >= speed and movement_dir_h == -1
+	)
+	var delta := acc if apply_acc else dec
+	
+	velocity.x = move_toward(velocity.x, speed, delta) 
+
+## Player's movement direction.
+func movement_dir() -> Vector2:
+	return velocity.sign()
+
+## Applies gravity to the velocity and clamps it to the gravity limit.
+func apply_gravity(delta: float) -> void:
+	velocity.y += gravity_force() * delta
+	 
+	velocity.y = clampf(velocity.y, -INF, gravity_limit())
+
+## Default values of the gravity force based on [member velocity].y value.
+func default_gravity_force() -> float:
+	return falling_gravity if velocity.y >= 0.0 else jumping_gravity
+
+## Gravity force based on the pressed key.
+func gravity_force() -> float:
+	return default_gravity_force() * (
+			jump_not_pressed_gravity_multiplier if not Input.is_action_pressed("jump")
+			else down_pressed_gravity_multiplier if Input.is_action_pressed("down") and velocity.y > 0
+			else 1.0
+	)
+
+## Gravity limit based on the pressed key.
+func gravity_limit() -> float:
+	return default_gravity_limit * (
+			down_pressed_gravity_multiplier if Input.is_action_pressed("down") and velocity.y > 0
+			else 1.0
+	)
+## Applies a vertical upward force affecting the player's vertical speed.
+## TODO: Make it calculate the applied force based on the current vertical speed.
+func apply_vertical_force(force: float) -> void:
+	velocity.y = -force
+
+## Performs a jump by applying upward force.
+## This function can be extended to add jump animations, sounds, particles, or other effects.
+func jump() -> void:
+	apply_vertical_force(jump_force)
+
+## Triggers a jump if the jump action was just pressed.
+func try_jump() -> void:
+	if Input.is_action_just_pressed("jump"):
+		jump()
