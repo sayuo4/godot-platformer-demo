@@ -1,7 +1,13 @@
-[gd_scene load_steps=6 format=3 uid="uid://8tmh6xvsllt0"]
+[gd_scene load_steps=12 format=3 uid="uid://8tmh6xvsllt0"]
 
 [ext_resource type="Script" uid="uid://gf5tc7312xrc" path="res://src/player/player.gd" id="1_4anbu"]
 [ext_resource type="Script" uid="uid://bu2h2ywnfvn6e" path="res://src/state_machine/state_machine.gd" id="2_rxibo"]
+[ext_resource type="Script" uid="uid://d2jpyi0nj02y1" path="res://src/player/states/player_air_entry_state.gd" id="3_x42xx"]
+[ext_resource type="Script" uid="uid://7dbodw08ihmu" path="res://src/player/states/player_fall_state.gd" id="4_l271a"]
+[ext_resource type="Script" uid="uid://bta85hqdedac5" path="res://src/player/states/player_jump_state.gd" id="5_8ydov"]
+[ext_resource type="Script" uid="uid://c28af3a6c8ldo" path="res://src/player/states/player_ground_entry_state.gd" id="6_ylhto"]
+[ext_resource type="Script" uid="uid://by565e2o54jor" path="res://src/player/states/player_idle_state.gd" id="7_cwolq"]
+[ext_resource type="Script" uid="uid://ctyct8n4j2j0r" path="res://src/player/states/player_run_state.gd" id="8_2smqc"]
 
 [sub_resource type="QuadMesh" id="QuadMesh_4anbu"]
 size = Vector2(56, 96)
@@ -36,7 +42,32 @@ mesh = SubResource("QuadMesh_rxibo")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_4anbu")
 
-[node name="StateMachine" type="Node" parent="." node_paths=PackedStringArray("target_node")]
+[node name="StateMachine" type="Node" parent="." node_paths=PackedStringArray("target_node", "default_state")]
 script = ExtResource("2_rxibo")
 target_node = NodePath("..")
+default_state = NodePath("PlayerAirEntryState")
 metadata/_custom_type_script = "uid://bu2h2ywnfvn6e"
+
+[node name="PlayerAirEntryState" type="Node" parent="StateMachine"]
+script = ExtResource("3_x42xx")
+metadata/_custom_type_script = "uid://d2jpyi0nj02y1"
+
+[node name="PlayerFallState" type="Node" parent="StateMachine"]
+script = ExtResource("4_l271a")
+metadata/_custom_type_script = "uid://7dbodw08ihmu"
+
+[node name="PlayerJumpState" type="Node" parent="StateMachine"]
+script = ExtResource("5_8ydov")
+metadata/_custom_type_script = "uid://bta85hqdedac5"
+
+[node name="PlayerGroundEntryState" type="Node" parent="StateMachine"]
+script = ExtResource("6_ylhto")
+metadata/_custom_type_script = "uid://c28af3a6c8ldo"
+
+[node name="PlayerIdleState" type="Node" parent="StateMachine"]
+script = ExtResource("7_cwolq")
+metadata/_custom_type_script = "uid://by565e2o54jor"
+
+[node name="PlayerRunState" type="Node" parent="StateMachine"]
+script = ExtResource("8_2smqc")
+metadata/_custom_type_script = "uid://ctyct8n4j2j0r"
