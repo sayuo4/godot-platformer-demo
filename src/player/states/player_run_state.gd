@@ -7,3 +7,8 @@ func _physics_update(delta: float) -> void:
 	player.try_jump()
 	
 	player.move_and_slide()
+	
+	if not player.is_on_floor():
+		switch_to_state(state_machine.states.get("PlayerAirEntryState"))
+	elif not player.velocity.x and not player.horizontal_input():
+		switch_to_state(state_machine.states.get("PlayerIdleState"))
