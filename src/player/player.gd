@@ -159,15 +159,20 @@ func gravity_limit() -> float:
 			else 1.0
 	)
 
-## Applies a vertical upward force affecting the player's vertical speed.
+## Applies an upward force affecting the player's vertical speed.
 ## TODO: Make it calculate the applied force based on the current vertical speed.
-func apply_vertical_force(force: float) -> void:
+func apply_upward_force(force: float) -> void:
 	velocity.y = -force
+
+## Applies a horizontal force affecting the player's horizontal speed.
+## TODO: Make it calculate the applied force based on the current horizontal speed.
+func apply_horizontal_force(force: float) -> void:
+	velocity.x = force
 
 ## Performs a jump by applying upward force.
 ## This function can be extended to add jump animations, sounds, particles, or other effects.
 func jump() -> void:
-	apply_vertical_force(jump_force)
+	apply_upward_force(jump_force)
 
 ## Triggers a jump if the jump action was just pressed.
 func try_jump() -> void:
