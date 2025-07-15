@@ -1,6 +1,9 @@
 class_name Player
 extends CharacterBody2D
 
+## Whether the player is flipped horizontally.
+@export var flip_h := false: set = set_flip_h
+
 @export_group("Movement")
 ## Maximum horizontal movement speed.
 @export var maximum_speed: float
@@ -82,6 +85,35 @@ extends CharacterBody2D
 ## Moving deceleration while the player is wall jumping and moving in the direction of the wall.
 @export var wall_jumping_toward_wall_dec: float
 
+## Flips the player horizontally based on the given value.
+func set_flip_h(value: bool) -> void:
+	if is_inside_tree():
+		flip_h = value
+		
+		if value:
+			scale.y = -abs(scale.y)
+			rotation_degrees = 180
+			return
+		
+		scale.y = abs(scale.y)
+		rotation_degrees = 0
+	
+	else:
+		await tree_entered
+		
+		set_flip_h(value)
+
+## Updates [member flip_h] based on [method horizontal_input].
+func update_flip_h() -> void:
+	var input_dir := signf(horizontal_input())
+	
+	if input_dir:
+		flip_h = false if input_dir == 1 else true
+
+## Player's horizontal facing direction.
+func look_dir() -> float:
+	return 1 if not flip_h else -1
+
 ## Horizontal input value based on left and right actions.
 func horizontal_input() -> float:
 	return Input.get_axis("left", "right")
@@ -126,6 +158,7 @@ func gravity_limit() -> float:
 			down_pressed_gravity_multiplier if Input.is_action_pressed("down") and velocity.y > 0
 			else 1.0
 	)
+
 ## Applies a vertical upward force affecting the player's vertical speed.
 ## TODO: Make it calculate the applied force based on the current vertical speed.
 func apply_vertical_force(force: float) -> void:
