@@ -62,28 +62,28 @@ extends CharacterBody2D
 
 @export_group("On Wall")
 @export_subgroup("Wall Slide")
-## Maximum vertical speed while wall sliding.
-@export var maximum_wall_sliding_speed: float
+## Maximum downward wall slide speed.
+@export var maximum_wall_slide_speed: float
 ## Multiplier applied to wall sliding speed while the player is pressing the down action.[br][br]
 ## [b]Note:[/b] The value of this variable will be multiplied by [member wall_sliding_speed].
-@export_range(1, 2) var down_pressed_wall_slide_speed_multiplier: float
+@export_range(1, 2) var down_pressed_wall_slide_multiplier: float
 ## Vertical acceleration while wall sliding.
-@export var wall_sliding_acc: float
+@export var wall_slide_acc: float
 
 @export_subgroup("Wall Jump")
-## Horizontal force of the wall jump.
-@export var wall_jump_horizontal_force: float
 ## Vertical force of the wall jump.
 @export var wall_jump_vertical_force: float
+## Horizontal force of the wall jump.
+@export var wall_jump_horizontal_force: float
 ## Minimum distance from the wall required for the player to initiate a wall jump.[br][br]
 ## [b]Note:[/b] This will work only if the player is moving towards the wall.
 @export var wall_jump_distance: float
 ## Moving acceleration while the player is wall jumping.
-@export var wall_jumping_acc: float
-## Moving deceleration while the player is wall jumping.
-@export var wall_jumping_dec: float
-## Moving deceleration while the player is wall jumping and moving in the direction of the wall.
-@export var wall_jumping_toward_wall_dec: float
+@export var wall_jump_acc: float
+## Default moving deceleration while the player is wall jumping.
+@export var default_wall_jump_dec: float
+## Moving deceleration while the player is wall jumping and moving to the direction of the wall.
+@export var wall_jump_toward_wall_dec: float
 
 ## Flips the player horizontally based on the given value.
 func set_flip_h(value: bool) -> void:
@@ -178,3 +178,61 @@ func jump() -> void:
 func try_jump() -> void:
 	if Input.is_action_just_pressed("jump"):
 		jump()
+
+## Direction of the last wall the player collided with.[br][br]
+## [b]Note:[/b] It returns the direction of the last wall even if the player is not currently colliding with it.[br]
+## See [method CharacterBody2D.get_wall_normal].
+func wall_dir() -> float:
+	return -signf(get_wall_normal().x)
+
+## Applies downward wall slide by accelerating the velocity towards the slide speed.
+func apply_wall_slide() -> void:
+	# Makes sure is_on_wall will return true.
+	velocity.x = look_dir()
+	
+	velocity.y = move_toward(velocity.y, wall_slide_speed(), wall_slide_acc)
+
+## Wall slide speed based on the pressed key.
+func wall_slide_speed() -> float:
+	return maximum_wall_slide_speed * (
+			down_pressed_wall_slide_multiplier if Input.is_action_pressed("down")
+			else 1.0
+	)
+
+## Switches to wall slide state if allowed.
+func try_wall_slide() -> void:
+	if can_wall_slide():
+		pass # TODO: Switch to wall slide state.
+
+## Whether the player is pressing towards the wall and is on it.
+func can_wall_slide() -> bool:
+	var input_dir := signf(horizontal_input())
+	
+	var is_correct_direction := input_dir == wall_dir()
+	var is_non_zero_value := input_dir != 0 and is_on_wall()
+	
+	return (
+			is_correct_direction
+			and is_non_zero_value
+	)
+
+## Performs a wall jump by applying upward and horizontal forces.
+func wall_jump() -> void:
+	var wall_jump_dir := -wall_dir()
+	
+	apply_upward_force(wall_jump_vertical_force)
+	apply_horizontal_force(wall_jump_horizontal_force * wall_jump_dir)
+	
+	# TODO: Switch to wall jump state.
+
+## Triggers a wall jump if the jump action was just pressed and player is on a wall.
+func try_wall_jump() -> void:
+	if Input.is_action_just_pressed("jump") and is_on_wall():
+		wall_jump()
+
+## Wall jump deceleration based on [method horizontal_input].
+func wall_jump_dec() -> float:
+	return (
+			wall_jump_toward_wall_dec if signf(horizontal_input()) == wall_dir()
+			else default_wall_jump_dec
+	)
