@@ -85,6 +85,9 @@ extends CharacterBody2D
 ## Moving deceleration while the player is wall jumping and moving to the direction of the wall.
 @export var wall_jump_toward_wall_dec: float
 
+## State machine used to manage the player.
+@onready var state_machine := get_node("StateMachine") as StateMachine
+
 ## Flips the player horizontally based on the given value.
 func set_flip_h(value: bool) -> void:
 	if is_inside_tree():
@@ -202,7 +205,7 @@ func wall_slide_speed() -> float:
 ## Switches to wall slide state if allowed.
 func try_wall_slide() -> void:
 	if can_wall_slide():
-		pass # TODO: Switch to wall slide state.
+		state_machine.active_state = state_machine.states.get("PlayerWallSlideState")
 
 ## Whether the player is pressing towards the wall and is on it.
 func can_wall_slide() -> bool:
@@ -223,7 +226,7 @@ func wall_jump() -> void:
 	apply_upward_force(wall_jump_vertical_force)
 	apply_horizontal_force(wall_jump_horizontal_force * wall_jump_dir)
 	
-	# TODO: Switch to wall jump state.
+	state_machine.active_state = state_machine.states.get("PlayerWallJumpState")
 
 ## Triggers a wall jump if the jump action was just pressed and player is on a wall.
 func try_wall_jump() -> void:
