@@ -1,0 +1,57 @@
+[gd_scene load_steps=6 format=3 uid="uid://cqrpr4rdxc2av"]
+
+[ext_resource type="PackedScene" uid="uid://8tmh6xvsllt0" path="res://src/player/player.tscn" id="1_b3fi5"]
+
+[sub_resource type="QuadMesh" id="QuadMesh_b3fi5"]
+size = Vector2(1152, 64)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_u1lph"]
+size = Vector2(1152, 64)
+
+[sub_resource type="QuadMesh" id="QuadMesh_khnfi"]
+size = Vector2(64, 648)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_khnfi"]
+size = Vector2(64, 648)
+
+[node name="PlayerTestScene" type="Node2D"]
+metadata/_edit_lock_ = true
+
+[node name="Map" type="Node2D" parent="."]
+metadata/_edit_lock_ = true
+
+[node name="Ground" type="StaticBody2D" parent="Map"]
+position = Vector2(576, 616)
+metadata/_edit_group_ = true
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="Map/Ground"]
+self_modulate = Color(0, 0, 0, 1)
+mesh = SubResource("QuadMesh_b3fi5")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Map/Ground"]
+shape = SubResource("RectangleShape2D_u1lph")
+
+[node name="Wall1" type="StaticBody2D" parent="Map"]
+position = Vector2(1120, 324)
+metadata/_edit_group_ = true
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="Map/Wall1"]
+self_modulate = Color(0, 0, 0, 1)
+mesh = SubResource("QuadMesh_khnfi")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Map/Wall1"]
+shape = SubResource("RectangleShape2D_khnfi")
+
+[node name="Wall2" type="StaticBody2D" parent="Map"]
+position = Vector2(864, 132)
+metadata/_edit_group_ = true
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="Map/Wall2"]
+self_modulate = Color(0, 0, 0, 1)
+mesh = SubResource("QuadMesh_khnfi")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Map/Wall2"]
+shape = SubResource("RectangleShape2D_khnfi")
+
+[node name="Player" parent="." instance=ExtResource("1_b3fi5")]
+position = Vector2(243, 495)
