@@ -9,19 +9,19 @@ extends CharacterBody2D
 @export var maximum_speed: float
 
 @export_subgroup("On Floor")
-## Moving acceleration while the player is running.
+## Move acceleration while the player is running.
 @export var running_acc: float
-## Moving deceleration while the player is running.
+## Move deceleration while the player is running.
 @export var running_dec: float
 
 @export_subgroup("In Air")
-## Moving acceleration while the player is jumping/going up.
+## Move acceleration while the player is jumping/going up.
 @export var jumping_acc: float
-## Moving deceleration while the player is jumping/going up.
+## Move deceleration while the player is jumping/going up.
 @export var jumping_dec: float
-## Moving acceleration while the player is falling.
+## Move acceleration while the player is falling.
 @export var falling_acc: float
-## Moving deceleration while the player is falling.
+## Move deceleration while the player is falling.
 @export var falling_dec: float
 
 @export_group("Vertical Movement")
@@ -78,11 +78,11 @@ extends CharacterBody2D
 ## Minimum distance from the wall required for the player to initiate a wall jump.[br][br]
 ## [b]Note:[/b] This will work only if the player is moving towards the wall.
 @export var wall_jump_distance: float
-## Moving acceleration while the player is wall jumping.
+## Move acceleration while the player is wall jumping.
 @export var wall_jump_acc: float
 ## Default moving deceleration while the player is wall jumping.
 @export var default_wall_jump_dec: float
-## Moving deceleration while the player is wall jumping and moving to the direction of the wall.
+## Move deceleration while the player is wall jumping and moving to the direction of the wall.
 @export var wall_jump_toward_wall_dec: float
 
 ## State machine used to manage the player.
