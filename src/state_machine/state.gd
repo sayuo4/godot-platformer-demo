@@ -18,16 +18,16 @@ func is_active() -> bool:
 	return state_machine.active_state == self
 
 ## Switches to the given state if it's called on the active state.
-func switch_to_state(new_state: State) -> void:
+func switch_to_state(next_state: State) -> void:
 	if is_active():
-		state_machine.active_state = new_state
+		state_machine.active_state = next_state
 
 ## Called when the state becomes active.
 func _enter(_previous_state: State) -> void:
 	pass
 
 ## Called when the state becomes inactive.
-func _exit(_new_state: State) -> void:
+func _exit(_next_state: State) -> void:
 	pass
 
 ## Called every process frame while the state is active.

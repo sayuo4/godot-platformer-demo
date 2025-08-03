@@ -2,7 +2,7 @@ class_name StateMachine
 extends Node
 
 ## Emitted when the active state is changed.
-signal state_transitioned(previous_state: State, new_state: State)
+signal state_transitioned(previous_state: State, next_state: State)
 
 ## Node managed by the state machine.
 @export var target_node: Node
@@ -45,28 +45,28 @@ func _physics_process(delta: float) -> void:
 ## Transitions between states in the state machine.
 ## Calls [method State._exit] and [method State._enter] between states.
 ## Validates the new state, and emits a transition signal.
-func set_active_state(new_state: State) -> void:
+func set_active_state(next_state: State) -> void:
 	var previous_state := active_state
 	
-	if new_state == previous_state:
+	if next_state == previous_state:
 		return
 	
-	if new_state:
-		if not new_state in states.values():
+	if next_state:
+		if not next_state in states.values():
 			active_state = null
 			push_error(
-					"Trying to activate an unknown state: '" + str(new_state.get_path())
+					"Trying to activate an unknown state: '" + str(next_state.get_path())
 					+ "' in state machine: '" + str(get_path()) + "'"
 			)
 			return
 		
-		active_state = new_state
+		active_state = next_state
 		
 		if previous_state:
-			previous_state._exit(new_state)
+			previous_state._exit(next_state)
 		
-		new_state._enter(previous_state)
+		next_state._enter(previous_state)
 	else:
 		active_state = null
 	
-	state_transitioned.emit(previous_state, new_state)
+	state_transitioned.emit(previous_state, next_state)
