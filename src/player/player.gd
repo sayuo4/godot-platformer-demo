@@ -1,6 +1,11 @@
 class_name Player
 extends CharacterBody2D
 
+## Emitted when the player touches a wall.
+signal touched_wall
+## Emitted when the player leaves a wall.
+signal left_wall
+
 ## Whether the player is flipped horizontally.
 @export var flip_h := false: set = set_flip_h
 
@@ -88,6 +93,22 @@ extends CharacterBody2D
 ## State machine used to manage the player.
 @onready var state_machine := get_node("StateMachine") as StateMachine
 
+## Timer used for jump coyote time.
+@onready var jump_coyote_timer := get_node("%JumpCoyoteTimer") as Timer
+## Timer used for wall jump coyote time.
+@onready var wall_jump_coyote_timer := get_node("%WallJumpCoyoteTimer") as Timer
+## Timer used for jump buffering.
+@onready var jump_buffer_timer := get_node("%JumpBufferTimer") as Timer
+## Timer used for wall jump buffering.
+@onready var wall_jump_buffer_timer := get_node("%WallJumpBufferTimer") as Timer
+
+## Whether the player is touching the wall.[br]
+## Used to emit [signal touched_wall] and [signal left_wall].
+var on_wall := false
+
+func _physics_process(_delta: float) -> void:
+	update_on_wall()
+
 ## Flips the player horizontally based on the given value.
 func set_flip_h(value: bool) -> void:
 	if is_inside_tree():
@@ -172,10 +193,12 @@ func apply_upward_force(force: float) -> void:
 func apply_horizontal_force(force: float) -> void:
 	velocity.x = force
 
-## Performs a jump by applying upward force.
-## This function can be extended to add jump animations, sounds, particles, or other effects.
+## Performs a jump by applying upward force.[br]
+## Stops jump and wall jump timers.
 func jump() -> void:
 	apply_upward_force(jump_force)
+	
+	stop_jump_timers()
 
 ## Triggers a jump if the jump action was just pressed.
 func try_jump() -> void:
@@ -219,7 +242,8 @@ func can_wall_slide() -> bool:
 			and is_non_zero_value
 	)
 
-## Performs a wall jump by applying upward and horizontal forces.
+## Performs a wall jump by applying upward and horizontal forces.[br]
+## Stops jump and wall jump timers.
 func wall_jump() -> void:
 	var wall_jump_dir := -wall_dir()
 	
@@ -227,10 +251,13 @@ func wall_jump() -> void:
 	apply_horizontal_force(wall_jump_horizontal_force * wall_jump_dir)
 	
 	state_machine.active_state = state_machine.states.get("PlayerWallJumpState")
+	
+	stop_jump_timers()
 
-## Triggers a wall jump if the jump action was just pressed and player is on a wall.
-func try_wall_jump() -> void:
-	if Input.is_action_just_pressed("jump") and is_on_wall():
+## Triggers a wall jump if the jump action was just pressed.[br]
+## If [member check_for_wall] equals true. the method requires the player to be on a wall to trigger the wall jump.
+func try_wall_jump(check_for_wall := true) -> void:
+	if Input.is_action_just_pressed("jump") and (is_on_wall() or not check_for_wall):
 		wall_jump()
 
 ## Wall jump deceleration based on [method horizontal_input].
@@ -239,3 +266,62 @@ func wall_jump_dec() -> float:
 			wall_jump_toward_wall_dec if signf(horizontal_input()) == wall_dir()
 			else default_wall_jump_dec
 	)
+
+## Updates [member on_wall] based on [method CharacterBody2D.is_on_wall].[br]
+## Emits [signal touched_wall] and [signal left_wall].
+func update_on_wall() -> void:
+	if is_on_wall():
+		if not on_wall:
+			touched_wall.emit()
+		
+		on_wall = true
+	else:
+		if on_wall:
+			left_wall.emit()
+		
+		on_wall = false
+
+func stop_jump_timers() -> void:
+	jump_coyote_timer.stop()
+	jump_buffer_timer.stop()
+	
+	wall_jump_coyote_timer.stop()
+	wall_jump_buffer_timer.stop()
+
+## Triggers a jump if the jump action was just pressed and [member jump_coyote_timer] is running.
+func try_coyote_jump() -> void:
+	if not jump_coyote_timer.is_stopped():
+		try_jump()
+
+## Starts jump coyote timer if the player is falling.
+func try_start_jump_coyote_timer() -> void:
+	if velocity.y >= 0:
+		jump_coyote_timer.start()
+
+## Triggers a jump if the [jump_buffer_timer] is running.
+func try_jump_buffer() -> void:
+	if not jump_buffer_timer.is_stopped():
+		jump()
+
+## Starts jump buffer timer if the jump action was just pressed.
+func try_start_jump_buffer_timer() -> void:
+	if Input.is_action_just_pressed("jump"):
+		jump_buffer_timer.start()
+
+## Triggers a wall jump if the jump action was just pressed and [member wall_jump_coyote_timer] is running
+func try_coyote_wall_jump() -> void:
+	if not wall_jump_coyote_timer.is_stopped():
+		try_wall_jump(false)
+
+func start_wall_jump_coyote_timer() -> void:
+	wall_jump_coyote_timer.start()
+
+## Triggers a wall jump if [member wall_jump_buffer_timer] is running.
+func try_wall_jump_buffer() -> void:
+	if not wall_jump_buffer_timer.is_stopped():
+		wall_jump()
+
+## Starts wall jump buffer timer if the jump action was just pressed and the player isn't on floor.
+func try_start_wall_jump_buffer_timer() -> void:
+	if Input.is_action_just_pressed("jump") and not is_on_floor():
+		wall_jump_buffer_timer.start()
